@@ -27,6 +27,7 @@ public class WebsocketClient {
                     System.out.println("connected");
                     socket.emit("subscribe", "marketdata_cnybtc"); // subscribe
                     socket.emit("subscribe", "marketdata_cnyltc"); // subscribe another market
+                    socket.emit("subscribe", "marketdata_btcltc"); // subscribe another market
                 }
             }).on("trade", new Emitter.Listener() {
                 @Override
