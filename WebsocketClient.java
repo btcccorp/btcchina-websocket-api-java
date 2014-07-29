@@ -1,5 +1,9 @@
 /*
  * An example for Java Socket.IO Client
+ * 
+ * Require installing socket.io client for Java first
+ * Refer to the source here to install socket.io client for Java: https://github.com/nkzawa/socket.io-client.java
+ *
  */
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
