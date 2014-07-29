@@ -24,7 +24,7 @@ public class WebsocketClient {
             socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    System.out.println("connected");
+                    System.out.println("Connected!");
                     socket.emit("subscribe", "marketdata_cnybtc"); // subscribe
                     socket.emit("subscribe", "marketdata_cnyltc"); // subscribe another market
                     socket.emit("subscribe", "marketdata_btcltc"); // subscribe another market
@@ -38,7 +38,7 @@ public class WebsocketClient {
             }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
-                    System.out.println("disconnected");
+                    System.out.println("Disconnected!");
                 }
             });
             socket.connect();
