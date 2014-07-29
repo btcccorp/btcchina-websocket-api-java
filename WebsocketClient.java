@@ -34,12 +34,6 @@ public class WebsocketClient {
                     JSONObject json = (JSONObject) args[0]; //receive the trade message
                     System.out.println(json); 
                 }
-            }).on("ticker", new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    JSONObject json = (JSONObject) args[0];//receive the ticker message
-                    System.out.println(json);
-                }
             }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
                 @Override
                 public void call(Object... args) {
