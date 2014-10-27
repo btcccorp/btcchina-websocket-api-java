@@ -8,14 +8,17 @@
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
+
 import org.json.JSONObject;
 
 public class SocketMain {
@@ -38,11 +41,15 @@ public class SocketMain {
 					SocketMain sm= new SocketMain();
 					@Override
 					public void call(Object... args) {
-						System.out.println("connected");
+						System.out.println("Connected!");
 						socket.emit("subscribe", "marketdata_cnybtc"); // subscribe
 						socket.emit("subscribe", "marketdata_cnyltc"); // subscribe another market
 						socket.emit("subscribe", "marketdata_btcltc"); // subscribe another market
-						//Use 'private' method to subscribe the order feed
+	                    socket.emit("subscribe", "grouporder_cnyltc"); // subscribe on grouporder
+	                    socket.emit("subscribe", "grouporder_cnybtc"); // subscribe another market
+	                    socket.emit("subscribe", "grouporder_btcltc"); // subscribe another market
+						
+	                    //Use 'private' method to subscribe the order and balance feed
 						try {
 								List arg = new ArrayList();
 								arg.add(sm.get_payload());
@@ -53,7 +60,12 @@ public class SocketMain {
 							e.printStackTrace();
 						}
 					}
-				}).on("trade", new Emitter.Listener() {
+				}).on("message", new Emitter.Listener() {
+	                @Override
+	                public void call(Object... args) {
+	                    System.out.println(args[0]); 
+	                }
+	            }).on("trade", new Emitter.Listener() {
 					@Override
 					public void call(Object... args) {
 						JSONObject json = (JSONObject) args[0]; //receive the trade message
@@ -65,16 +77,28 @@ public class SocketMain {
 						JSONObject json = (JSONObject) args[0];//receive the ticker message
 						System.out.println(json);
 					}
-				}).on("order", new Emitter.Listener() {
+				}).on("grouporder", new Emitter.Listener() {
+	                @Override
+	                public void call(Object... args) {
+	                    JSONObject json = (JSONObject) args[0];//receive the grouporder message
+	                    System.out.println(json);
+	                }
+	            }).on("order", new Emitter.Listener() {
+	                @Override
+	                public void call(Object... args) {
+	                    JSONObject json = (JSONObject) args[0];//receive the order message
+	                    System.out.println(json);
+	                }
+	            }).on("account_info", new Emitter.Listener() {
+	                @Override
+	                public void call(Object... args) {
+	                    JSONObject json = (JSONObject) args[0];//receive the balance message
+	                    System.out.println(json);
+	                }
+	            }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
 					@Override
 					public void call(Object... args) {
-						JSONObject json = (JSONObject) args[0];//receive your order feed
-						System.out.println(json);
-					}
-				}).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
-					@Override
-					public void call(Object... args) {
-						System.out.println("disconnected");
+						System.out.println("Disconnected!");
 					}
 				});
 				socket.connect();
@@ -84,14 +108,14 @@ public class SocketMain {
 	}
     
 	public String get_payload() throws Exception{
-		postdata = "{\"tonce\":\""+tonce.toString()+"\",\"accesskey\":\""+ACCESS_KEY+"\",\"requestmethod\": \"post\",\"id\":\""+tonce.toString()+"\",\"method\": \"subscribe\", \"params\": [\"order_cnyltc\"]}";//subscribe order feed for cnyltc market
+		postdata = "{\"tonce\":\""+tonce.toString()+"\",\"accesskey\":\""+ACCESS_KEY+"\",\"requestmethod\": \"post\",\"id\":\""+tonce.toString()+"\",\"method\": \"subscribe\", \"params\": [\"order_cnybtc\",\"order_cnyltc\",\"order_btcltc\",\"account_info\"]}";//subscribe order and balance feed
 			
 		System.out.println("postdata is: " + postdata);
 		return postdata;
 	}
     
 	public String get_sign() throws Exception{
-		String params = "tonce="+tonce.toString()+"&accesskey="+ACCESS_KEY+"&requestmethod=post&id="+tonce.toString()+"&method=subscribe&params=order_cnyltc"; //subscribe the order of cnyltc market
+		String params = "tonce="+tonce.toString()+"&accesskey="+ACCESS_KEY+"&requestmethod=post&id="+tonce.toString()+"&method=subscribe&params=order_cnybtc,order_cnyltc,order_btcltc,account_info"; 
 		String hash = getSignature(params, SECRET_KEY);
 		String userpass = ACCESS_KEY + ":" + hash;
 		String basicAuth = DatatypeConverter.printBase64Binary(userpass.getBytes());
