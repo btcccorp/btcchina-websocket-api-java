@@ -37,12 +37,10 @@ public class WebSocketClient {
 
             socket.emit("subscribe", "marketdata_cnybtc");
             socket.emit("subscribe", "marketdata_cnyltc");
-            socket.emit("subscribe", "marketdata_btcltc");
-
+            
             socket.emit("subscribe", "grouporder_cnybtc");
             socket.emit("subscribe", "grouporder_cnyltc");
-            socket.emit("subscribe", "grouporder_btcltc");
-
+            
             socket.emit("private", Arrays.asList(payload(), sign()));
         })
         .on("message", args -> log.info("message: {}", args[0]))
@@ -90,7 +88,7 @@ public class WebSocketClient {
         userClaim.requestmethod = "post";
         userClaim.id = tonce;
         userClaim.method = "subscribe";
-        userClaim.params = Arrays.asList("order_cnybtc", "order_cnyltc", "order_btcltc", "account_info");
+        userClaim.params = Arrays.asList("order_cnybtc", "order_cnyltc", "account_info");
     }
 
     private static String payload() {
